@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.batis.mapper.EmployeeMapper">
+	<resultMap type="Employee" id="employee">
+		<id property="id" column="id"/>
+		<result property="codeId" column="codeId"/>
+		<result property="name" column="name"/>
+		<result property="position" column="position"/>
+		<result property="birthday" column="birthday"/>
+		<result property="nationality" column="nationality"/>
+	</resultMap>
+	
+	<select id="getAllEmployee" parameterType="int" resultMap="employee">
+		SELECT id, codeId, name, position, birthday, nationality
+		From employees
+	</select>
+	
+	<select id="getFilterElement" parameterType="Employee" resultMap="employee">
+		SELECT id, codeId, name, position, birthday, nationality
+		From employees
+		WHERE codeId = #{codeId} OR birthday = #{birthday} OR name = #{name} 
+		ORDER BY id desc
+	</select>
+	
+	<select id="getFilter2Element" parameterType="Employee" resultMap="employee">
+		SELECT id, codeId, name, position, birthday, nationality
+		From employees
+		WHERE (codeId = #{codeId} AND name = #{name}) OR (codeId = #{codeId} AND birthday = #{birthday}) OR (name = #{name} AND birthday = #{birthday})
+		ORDER BY id desc
+	</select>
+	
+	<select id="getFilter3Element" parameterType="Employee" resultMap="employee">
+		SELECT id, codeId, name, position, birthday, nationality
+		From employees
+		WHERE codeId = #{codeId} AND name = #{name} AND birthday = #{birthday}
+		ORDER BY id
+	</select>
+	
+	<select id="getLastIdEmployee" resultType="int">
+		SELECT id
+		FROM employees
+		ORDER BY id DESC LIMIT 1
+	</select>
+		
+	<insert id="saveEmployee" parameterType="Employee">
+		INSERT INTO employees(id, codeId, name, position, birthday, nationality) 
+		VALUES (#{id}, #{codeId}, #{name}, #{position}, #{birthday}, #{nationality})
+	</insert>
+	
+	<update id="updateEmployee" parameterType="Employee">
+		UPDATE employees
+		SET	codeId = #{codeId},
+			name = #{name},
+			position = #{position},
+			birthday = #{birthday},
+			nationality = #{nationality}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateIdTableEmployee" parameterType="map">
+		UPDATE employees
+		SET id = #{change} 
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteEmployee" parameterType="string">
+		DELETE FROM employees
+		WHERE codeId = N#{codeId}
+	</delete>
+	
+</mapper>
