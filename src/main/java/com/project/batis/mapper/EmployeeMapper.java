@@ -15,7 +15,7 @@ public interface EmployeeMapper {
 	@Transactional
 	public void updateEmployee(Employee emp);
 
-	public void deleteEmployee(String id);
+	public void deleteEmployee(int id);
 
 	public List<Employee> getAllEmployee(); 
 	

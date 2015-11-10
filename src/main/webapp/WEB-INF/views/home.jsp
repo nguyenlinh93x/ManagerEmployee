@@ -13,7 +13,6 @@
 <link
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css"
 	rel="stylesheet">
-	<link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
 
 <link href="${pageContext.request.contextPath}/resources/css/main.css"
 	rel="stylesheet" type="text/css">
@@ -44,7 +43,7 @@
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script
 		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+
 	<script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
 	
 	<script

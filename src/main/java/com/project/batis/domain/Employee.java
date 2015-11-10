@@ -4,7 +4,7 @@ import java.sql.Date;
 
 public class Employee {
 	private int id;
-	private String codeId;
+	private String sex;
 	private String name;
 	private String position;
 	private Date birthday;
@@ -13,10 +13,10 @@ public class Employee {
 	public Employee() {
 	}
 
-	public Employee(int id, String codeId, String name, String position,
+	public Employee(int id, String sex, String name, String position,
 			Date birthday, String nationality) {
 		this.id = id;
-		this.codeId = codeId;
+		this.sex = sex;
 		this.name = name;
 		this.position = position;
 		this.birthday = birthday;
@@ -31,12 +31,12 @@ public class Employee {
 		this.id = id;
 	}
 
-	public String getCodeId() {
-		return codeId;
+	public String getSex() {
+		return sex;
 	}
 
-	public void setCodeId(String codeId) {
-		this.codeId = codeId;
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 
 	public String getName() {
@@ -73,7 +73,7 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", codeId=" + codeId + ", name=" + name
+		return "Employee [id=" + id + ", sex=" + sex + ", name=" + name
 				+ ", position=" + position + ", birthday=" + birthday
 				+ ", nationality=" + nationality + "]";
 	}

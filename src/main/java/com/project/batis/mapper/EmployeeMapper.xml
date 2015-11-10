@@ -4,7 +4,7 @@
 <mapper namespace="com.project.batis.mapper.EmployeeMapper">
 	<resultMap type="Employee" id="employee">
 		<id property="id" column="id"/>
-		<result property="codeId" column="codeId"/>
+		<result property="sex" column="sex"/>
 		<result property="name" column="name"/>
 		<result property="position" column="position"/>
 		<result property="birthday" column="birthday"/>
@@ -12,28 +12,28 @@
 	</resultMap>
 	
 	<select id="getAllEmployee" parameterType="int" resultMap="employee">
-		SELECT id, codeId, name, position, birthday, nationality
+		SELECT id, sex, name, position, birthday, nationality
 		From employees
 	</select>
 	
 	<select id="getFilterElement" parameterType="Employee" resultMap="employee">
-		SELECT id, codeId, name, position, birthday, nationality
+		SELECT id, sex, name, position, birthday, nationality
 		From employees
-		WHERE codeId = #{codeId} OR birthday = #{birthday} OR name = #{name} 
+		WHERE id = #{id} OR birthday = #{birthday} OR name = #{name} 
 		ORDER BY id desc
 	</select>
 	
 	<select id="getFilter2Element" parameterType="Employee" resultMap="employee">
-		SELECT id, codeId, name, position, birthday, nationality
+		SELECT id, sex, name, position, birthday, nationality
 		From employees
-		WHERE (codeId = #{codeId} AND name = #{name}) OR (codeId = #{codeId} AND birthday = #{birthday}) OR (name = #{name} AND birthday = #{birthday})
+		WHERE (id = #{id} AND name = #{name}) OR (id = #{id} AND birthday = #{birthday}) OR (name = #{name} AND birthday = #{birthday})
 		ORDER BY id desc
 	</select>
 	
 	<select id="getFilter3Element" parameterType="Employee" resultMap="employee">
-		SELECT id, codeId, name, position, birthday, nationality
+		SELECT id, sex, name, position, birthday, nationality
 		From employees
-		WHERE codeId = #{codeId} AND name = #{name} AND birthday = #{birthday}
+		WHERE id = #{id} AND name = #{name} AND birthday = #{birthday}
 		ORDER BY id
 	</select>
 	
@@ -44,13 +44,13 @@
 	</select>
 		
 	<insert id="saveEmployee" parameterType="Employee">
-		INSERT INTO employees(id, codeId, name, position, birthday, nationality) 
-		VALUES (#{id}, #{codeId}, #{name}, #{position}, #{birthday}, #{nationality})
+		INSERT INTO employees(id, sex, name, position, birthday, nationality) 
+		VALUES (#{id}, #{sex}, #{name}, #{position}, #{birthday}, #{nationality})
 	</insert>
 	
 	<update id="updateEmployee" parameterType="Employee">
 		UPDATE employees
-		SET	codeId = #{codeId},
+		SET	sex = #{sex},
 			name = #{name},
 			position = #{position},
 			birthday = #{birthday},
@@ -64,9 +64,9 @@
 		WHERE id = #{id}
 	</update>
 	
-	<delete id="deleteEmployee" parameterType="string">
+	<delete id="deleteEmployee" parameterType="int">
 		DELETE FROM employees
-		WHERE codeId = N#{codeId}
+		WHERE id = #{id}
 	</delete>
 	
 </mapper>

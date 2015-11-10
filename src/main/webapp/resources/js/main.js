@@ -60,7 +60,7 @@ jQuery(document).ready(function() {
 			var date = "";
 		}
 		
-		data['employee'].push({'id' : jsonArray[i].id, 'codeId' : jsonArray[i].codeId, 'name' : jsonArray[i].name,'position' : jsonArray[i].position , 'birthday' : date, 'nationality' : jsonArray[i].nationality, 'checked' : false});
+		data['employee'].push({'id' : jsonArray[i].id, 'sex' : jsonArray[i].sex, 'name' : jsonArray[i].name,'position' : jsonArray[i].position , 'birthday' : date, 'nationality' : jsonArray[i].nationality, 'checked' : false});
 	}
 	
 	//Config datepicker
@@ -72,11 +72,24 @@ jQuery(document).ready(function() {
 		showButtonPanel: true
 	});
 	
+	
+	
 	//Auto sort id if it isn't sorted
 	//Load Database show on table
 	//loadTableEmployee(data);
 	//Number of page you want seperate.
-	var numberRowOfPage = 10;
+	var numberRowOfPage = 5;
+	//Set numberRowOfPage when user change value
+	jQuery("select#pagination-number").on('change', function(event) {
+		console.log(jQuery(this).val());
+		if(jQuery(this).val() == 'all') {
+			numberRowOfPage = data['employee'].length;
+		} else {
+			numberRowOfPage = jQuery(this).val();
+		}
+		initPagination(numberRowOfPage);
+	});
+	
 	initPagination(numberRowOfPage);
 	/*
 	 * Init pagination employee table
@@ -112,6 +125,7 @@ jQuery(document).ready(function() {
 					}
 				}
 			}
+			//We need make a case when pageSize > 10, it has a tag a "..."
 		//If pagination bar is exist, remove it and create again
 		} else {
 			jQuery('#myPager li#page-previous').nextUntil('#myPager li#page-next').remove();
@@ -126,9 +140,113 @@ jQuery(document).ready(function() {
 			}
 		}
 		
-		
-		
+		//Add disable next and previous button when we have 1 page
+		var closestElement = jQuery('#myPager #page-previous').next().find('a').text();
+		console.log('a1: ' + closestElement);
+		var closestNextElement = jQuery('#myPager #page-next').prev().find('a').text();
+		console.log('b1: ' + closestNextElement);
+		if(closestElement == closestNextElement) {
+			jQuery('#myPager li#page-previous, #myPager li#page-next').addClass('disabled');	
+		} else {
+			jQuery('#myPager li#page-previous').addClass('disabled');	
+			jQuery('#myPager li#page-next').removeClass('disabled');	
+		}
 	}
+	
+	//Catch event click number of pagination
+	jQuery('#myPager').on('click', 'li > a', function(event) {
+		var oldCLick = jQuery('#myPager').find('li.active > a').text();
+		if(jQuery(this).parent().hasClass('active') || jQuery(this).parent().hasClass('disabled')) {
+			event.preventDefault();
+		} else {
+			event.preventDefault();
+			var startNumber = 0;
+			var show = {"employee": []};
+			//Value of tag a
+			var number = parseInt(jQuery(this).text());
+			//Set value when >> button is clicked
+			
+			var closestElement = jQuery('#myPager #page-previous').next().find('a').text();
+			var closestNextElement = jQuery('#myPager #page-next').prev().find('a').text();
+			
+				//Disabled or enable button previous when click number nearest with previous
+			if(jQuery(this).text() != closestElement) {
+				jQuery('#myPager li#page-previous').removeClass('disabled');
+			} else {
+				jQuery('#myPager li#page-previous').addClass('disabled');
+			}
+			//Disabled or enable button next when click number nearest with next
+			if(jQuery(this).text() != closestNextElement) {
+				jQuery('#myPager li#page-next').removeClass('disabled');
+			} else {
+				jQuery('#myPager li#page-next').addClass('disabled');
+			}
+				
+			
+			
+			
+			
+			//Get value of element before element is actived
+			if(jQuery(this).text() == 'Previous') {
+				var numberElement = jQuery('#myPager').find('li.active').prev();
+				number = numberElement.find('a').text();
+				//Remove all class active
+				jQuery(this).parent().parent().find('li').removeClass('active');
+				numberElement.addClass('active');
+				if(number != closestElement) {
+					jQuery('#myPager li#page-previous').removeClass('disabled');
+				} else {
+					jQuery('#myPager li#page-previous').addClass('disabled');
+				}
+			} else if(jQuery(this).text().trim() == 'Next') {
+				var numberElement = jQuery('#myPager').find('li.active').next();
+				number = numberElement.find('a').text();
+				//Remove all class active
+				jQuery(this).parent().parent().find('li').removeClass('active');
+				numberElement.addClass('active');
+				console.log("a: " + closestNextElement);
+				if(number != closestNextElement) {
+					jQuery('#myPager li#page-next').removeClass('disabled');
+				} else {
+					jQuery('#myPager li#page-next').addClass('disabled');
+				}
+			} else {
+				jQuery(this).parent().parent().find('li').removeClass('active');
+				jQuery(this).parent().addClass('active');
+			}
+			//Create a object array to store
+			
+			
+		
+			//console.log(number);
+			//Find the last id of table
+			if(oldCLick < number) {
+				var distance = number - oldCLick;
+				startNumber =  (parseInt(jQuery('#example tr#tr-header').next().find('td.table-stt').text()) + (parseInt(numberRowOfPage) * parseInt(distance))) - 1;
+				console.log(startNumber);
+			} else if(oldCLick > number){
+				var distance = oldCLick - number;
+				startNumber = parseInt(jQuery('#example tr#tr-header').next().find('td.table-stt').text()) - ((parseInt(numberRowOfPage)+1) * parseInt(distance));
+			}
+
+			var count = 1;
+			
+			for(var i = startNumber; i < data['employee'].length; i++) {
+				if(data.employee[i] != null) {
+					if(count <= numberRowOfPage) {
+						show['employee'].push(data.employee[i]);
+						++count;
+					} else {
+						break;
+					}
+				}
+				
+			}
+			loadTableEmployee(show);
+			console.log(show);
+		}
+		
+	})
 	
 	//Catch event click select option
 	jQuery("select[name='filter-emp']").on('change', function(event) {
@@ -238,12 +356,12 @@ jQuery(document).ready(function() {
 				//console.log("length " + data.employee.length + ' ' + number_delete);
 				for(var i=0; i < data.employee.length; i++) {
 					if(data.employee[i].id === number_delete) {
-						console.log("/batis/delete/" + (data.employee[i].codeId));
+						console.log("/batis/delete/" + (data.employee[i].id));
 						jQuery.ajax({
 							scriptCharset: "utf-8", 
 							contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 							type: 'DELETE',
-							url: "/batis/delete/" +(data.employee[i].codeId),
+							url: "/batis/delete/" +(data.employee[i].id),
 							success: function(data) {
 								
 							}
@@ -272,8 +390,8 @@ jQuery(document).ready(function() {
 		modal.find('input[name="id"]').attr('value', id);
 		
 		//Set input EmpId a value
-		var codeId = parent.find('td.table-code').text();
-		modal.find('input[name="codeId"]').attr('value', codeId);
+		var sex = parent.find('td.table-sex').text();
+		modal.find('input[name="sex"]').attr('value', sex);
 		
 		//Set input Name a value
 		var name = parent.find('td > a[name="modalEmp"]').text();
@@ -344,7 +462,7 @@ jQuery(document).ready(function() {
 				
 			})
 			console.log(dataJson);
-			if(dataJson['codeId'] != "" && dataJson['name'] != "" ) {
+			if(dataJson['sex'] != "" && dataJson['name'] != "" ) {
 				jQuery.ajax({
 					contentType : 'application/json; charset=utf-8',
 					type : 'POST',
@@ -411,7 +529,7 @@ jQuery(document).ready(function() {
 		jQuery('#addnew #table-add-lastrow').before("<tr>" + 
 				"<th><input type='checkbox' name='check-all' value=''></th>"
 				+"<td class='table-add-stt'><input disabled='disabled' type='text' class='form-control' name='id' required value='"+(++idEmp)+"'/></td>"
-				+"<td class='table-add-code'><input type='text' class='form-control' name='codeId' required placeholder='Ex:M2345, NY123, etc!'/></td>"
+				+"<td class='table-add-sex'><input type='text' class='form-control' name='sex' required placeholder='Ex:M2345, NY123, etc!'/></td>"
 				+"<td><input type='text' class='form-control' name='name' required placeholder='Your full name!'/></td>"
 				+"<td><input type='text' class='form-control' name='position' required placeholder='Ex:Employee, Manager'/></td>"
 				+"<th><input type='text' class='datepicker form-control' name='birthday' value='' placeholder='dd/mm/yyyy'></th>"
@@ -445,7 +563,7 @@ jQuery(document).ready(function() {
 		if(jQuery('#span-ei-id').css('display') != 'none') {
 			var checkId = jQuery('#span-ei-id').find('input[type="checkbox"]').prop('checked');
 			if(checkId === false) {
-				dataFilter['codeId'] = jQuery('#span-ei-id').find('input[name="ei-id"]').val();
+				dataFilter['id'] = jQuery('#span-ei-id').find('input[name="ei-id"]').val();
 			}
 		}
 		//Get name
@@ -479,7 +597,7 @@ jQuery(document).ready(function() {
 						jQuery('#tr-header').after("<tr>" + 
 								"<th><input type='checkbox' name='check-all' value=''></th>"
 								+"<td class='table-stt'>"+(data[i].id)+"</td>"
-								+"<td class='table-code'>"+(data[i].codeId)+"</td>"
+								+"<td class='table-sex'>"+(data[i].sex)+"</td>"
 								+"<td><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data[i].name+"</a></td>"
 								+"<td class='table-position'>"+(data[i].position)+"</td>"
 								+"<td class='table-birthday'>"+(data[i].birthday)+"</td>"
@@ -497,7 +615,7 @@ jQuery(document).ready(function() {
 		if(jQuery('#span-ei-id').css('display') != "none" && jQuery('#span-ei-id input[name="ei-id"]').val().length <= 0 ||
 			jQuery('#span-ei-name').css('display') != "none" && jQuery('#span-ei-name input[name="ei-name"]').val().length <= 0 ||
 			jQuery('#span-ei-date').css('display') != "none" && jQuery('#span-ei-date input[name="ei-birthdate"]').val().length <= 0) {
-			jQuery('#modalFailed .modal-header').find('h4').text("Error: A or more your input empty! If you don't use this field, please check into checkbox!");
+			jQuery('#modalFailed .modal-header').find('h4').text("Error: A or more your input is empty or this employee is not exist ! If you don't use this field, please check into checkbox!");
 			loadTableEmployee(data);
 		}
 		
@@ -597,7 +715,7 @@ jQuery('#span-ei-name input[name="ei-name"]').on('focusout keyup', function(e) {
 				jQuery('.full-contain #table-lastrow').before("<tr>" + 
 				"<th><input type='checkbox' name='check-all' value='' "+data.employee[i].checked+"></th>"
 				+"<td class='table-stt'>"+(data.employee[i].id)+"</td>"
-				+"<td class='table-code'>"+(data.employee[i].codeId)+"</td>"
+				+"<td class='table-sex'>"+(data.employee[i].sex)+"</td>"
 				+"<td><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data.employee[i].name+"</a></td>"
 				+"<td class='table-position'>"+(data.employee[i].position)+"</td>"
 				+"<td class='table-birthday'>"+(data.employee[i].birthday)+"</td>"

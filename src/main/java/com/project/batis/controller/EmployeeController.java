@@ -34,22 +34,17 @@ public class EmployeeController {
 	}
 
 	// Get delete event from ajax
-	@RequestMapping(value = "/delete/{codeId}", method = RequestMethod.DELETE, headers = "Accept=*/*", produces = "application/x-www-form-urlencoded;charset=UTF-8")
-	public @ResponseBody String deleteEmployee(@PathVariable String codeId) {
+	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, headers = "Accept=*/*", produces = "application/x-www-form-urlencoded;charset=UTF-8")
+	public @ResponseBody String deleteEmployee(@PathVariable int id) {
 		String decoded = "";
-		try {
-			// Decode codeId from ISO to UTF-8 string
-			decoded = new String(codeId.getBytes("ISO-8859-1"));
-			employeeService.deleteEmployee(decoded);
-			// System.out.println(decoded);
-			// List<Employee> listEmp = employeeService.getAllEmployee();
-			// for (Employee employee : listEmp) {
-			// System.out.println(employee);
-			// }
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// Decode codeId from ISO to UTF-8 string
+		// decoded = new String(codeId.getBytes("ISO-8859-1"));
+		employeeService.deleteEmployee(id);
+		// System.out.println(decoded);
+		// List<Employee> listEmp = employeeService.getAllEmployee();
+		// for (Employee employee : listEmp) {
+		// System.out.println(employee);
+		// }
 
 		return decoded;
 	}
@@ -97,21 +92,21 @@ public class EmployeeController {
 	public @ResponseBody List<Employee> filterEmployee(
 			@RequestBody Employee employee, BindingResult result) {
 		List<Employee> listOfFilter = new ArrayList<Employee>();
-		System.out.println("Filter: " + employee); 
+		System.out.println("Filter: " + employee);
 		if (result.hasErrors()) {
 			System.out.println("error");
 			return null;
 		}
-		if (employee.getCodeId() != null && employee.getName() != null
+		if (employee.getId() > 0 && employee.getName() != null
 				&& employee.getBirthday() != null) {
 			listOfFilter = employeeService.getFilter3Element(employee);
-		} else if ((employee.getCodeId() == null && employee.getName() != null && employee
+		} else if ((employee.getId() <= 0 && employee.getName() != null && employee
 				.getBirthday() != null)
-				|| (employee.getName() == null && employee.getCodeId() != null && employee
+				|| (employee.getName() == null && employee.getId() > 0 && employee
 						.getBirthday() != null)
 				|| (employee.getBirthday() == null
-						&& employee.getCodeId() != null && employee.getName() != null)) {
-		
+						&& employee.getId() > 0 && employee.getName() != null)) {
+
 			listOfFilter = employeeService.getFilter2Element(employee);
 		} else {
 			listOfFilter = employeeService.getFilterElement(employee);
