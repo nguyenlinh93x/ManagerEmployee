@@ -226,7 +226,7 @@ jQuery(document).ready(function() {
 				console.log(startNumber);
 			} else if(oldCLick > number){
 				var distance = oldCLick - number;
-				startNumber = parseInt(jQuery('#example tr#tr-header').next().find('td.table-stt').text()) - ((parseInt(numberRowOfPage)+1) * parseInt(distance));
+				startNumber = (parseInt(jQuery('#example tr#tr-header').next().find('td.table-stt').text()) - (parseInt(numberRowOfPage) * parseInt(distance))) - 1;
 			}
 
 			var count = 1;
