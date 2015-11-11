@@ -8,9 +8,10 @@
 	
 	<!-- Body of add new -->
 	<div id="addnew" class="container" style="background-color: white; margin-bottom: 20px;">
-	<form:form action="${pageContext.request.contextPath}/submitAdd" method="post" modelAttribute="employeeForm">
 		<div class="full-contain"><hr />
 			<h3 style="color: blue;">Add New Employee</h3>
+			<div id="addnew-alert" class="alert alert-danger hide">
+			</div>
 			<table class="table">
 				<tr id="tr-add-header" class="border">
 					<th class="table-add-check"><input type="checkbox" name="check-all-main" value=""></th>
@@ -18,7 +19,7 @@
 					<th class="table-add-code">Sex</th>
 					<th class="table-add-name">Name</th>
 					<th class="table-add-position">Position</th>
-					<th class="table-add-date">Date</th>
+					<th class="table-add-date">Birthday</th>
 					<th class="table-add-region">Nationality</th>
 				</tr>
 				<tr id="table-add-lastrow">
@@ -34,8 +35,6 @@
 				</tr>
 			</table>
 		</div>
-	</form:form>
-	
 	</div>
 	
 	<!-- End body of add new -->

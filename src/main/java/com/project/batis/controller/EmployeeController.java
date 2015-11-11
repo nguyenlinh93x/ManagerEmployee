@@ -9,13 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.batis.domain.Employee;
+import com.project.batis.domain.EmployeeForm;
 import com.project.batis.mapper.EmployeeMapper;
 
 @Controller
@@ -63,12 +66,14 @@ public class EmployeeController {
 	}
 
 	// Add employee to database
-	@RequestMapping(value = "/submitAdd", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/submitAdd", method = RequestMethod.POST,consumes="application/json" , produces = "application/json;charset=UTF-8")
 	public @ResponseBody boolean submitAddNewEmployee(
-			@RequestBody Employee employee, HttpServletRequest request) {
-		// System.out.println("Rs: " + employee);
+			@RequestBody Employee[] employeeList, HttpServletRequest request) {
+		for(Employee emp : employeeList) {
+			employeeService.saveEmployee(emp);
+		}
 		// System.out.println("Quản lý");
-		employeeService.saveEmployee(employee);
+//		employeeService.saveEmployee(employee);
 		return true;
 	}
 
@@ -86,15 +91,11 @@ public class EmployeeController {
 	}
 
 	// Filter employee
-	@RequestMapping(value = "/filter", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/filter", method = RequestMethod.POST,consumes="application/json" ,produces = "application/json;charset=UTF-8")
 	public @ResponseBody List<Employee> filterEmployee(
-			@RequestBody Employee employee, BindingResult result) {
+			@RequestBody Employee employee) {
 		List<Employee> listOfFilter = new ArrayList<Employee>();
 		System.out.println("Filter: " + employee);
-		if (result.hasErrors()) {
-			System.out.println("error");
-			return null;
-		}
 		if (employee.getId() > 0 && employee.getName() != null
 				&& employee.getBirthday() != null) {
 			listOfFilter = employeeService.getFilter3Element(employee);

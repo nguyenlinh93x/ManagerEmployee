@@ -101,7 +101,8 @@
 							<tr id="tr-header" class="border">
 								<th class="table-check"><input type="checkbox" name="check-all-main" value=""></th>
 								<th class="table-stt">Stt</th>
-								<th class="table-code">Sex</th>
+								<th class="table-id">Id</th>
+								<th class="table-sex">Sex</th>
 								<th class="table-name">Name</th>
 								<th class="table-position">Position</th>
 								<th class="table-date">Birthday</th>
@@ -112,7 +113,7 @@
 								<!-- <button class="btn btn-primary" name="add">+</button> -->
 									<button class="btn btn-primary" name="delete">-</button>
 								</th>
-								<td class="none-border" colspan="5">
+								<td class="none-border" colspan="6">
 									<div class="col-md-10 text-center">
 										<!-- Pagination page -->
 						      			<ul class="pagination pagination-sm pager" id="myPager">
