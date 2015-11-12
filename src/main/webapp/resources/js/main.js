@@ -5,8 +5,9 @@ jQuery(window).load(function() {
 	
 });
 
+
+
 jQuery(document).ready(function() {
-//	jQuery('#example').dataTable();
 	jQuery('#span-ei-id input[name="ei-id"]').popover();
 	jQuery('#span-ei-name input[name="ei-name"]').popover();
 	//Effect scroll mouse
@@ -20,6 +21,8 @@ jQuery(document).ready(function() {
 
 		return false;
 	});
+	
+	
 	hideElement();
 	/*
 	 * Start table employee and filter
@@ -29,7 +32,7 @@ jQuery(document).ready(function() {
 	
 	//Use ajax get employee show for table
 	function getAllEmployee() {
-		jQuery.ajax({
+		jQuery.when(jQuery.ajax({
 			type: 'GET',
 			url: "/batis/getJson",
 			async: false,
@@ -40,30 +43,32 @@ jQuery(document).ready(function() {
 					setTest(data);
 				}
 			}
+		})).then(function(a) {
+			var jsonArray = JSON.parse(JSON.stringify(test));
+			for(var i=0; i<jsonArray.length; i++) {
+				if(jsonArray[i].birthday != null) {
+					var birthdayTime = new Date(jsonArray[i].birthday);
+					var month = birthdayTime.getMonth() + 1;
+					var day = birthdayTime.getDate();
+					var year = birthdayTime.getFullYear();
+					var date = day + "-" + month + "-" + year;
+				} else {
+					var date = "";
+				}
+				
+				data['employee'].push({'id' : jsonArray[i].id, 'sex' : jsonArray[i].sex, 'name' : jsonArray[i].name,'position' : jsonArray[i].position , 'birthday' : date, 'nationality' : jsonArray[i].nationality, 'checked' : false});
+				stt[i] = i+1;
+			}
+			
 		});
 	}
 	
 	
-	//Declare a json array
+	//Declare a object array
 	var data = {"employee": []};
 	var stt = [];
 	getAllEmployee();
 	//Insert data to varible: data
-	var jsonArray = JSON.parse(JSON.stringify(test));
-	for(var i=0; i<jsonArray.length; i++) {
-		if(jsonArray[i].birthday != null) {
-			var birthdayTime = new Date(jsonArray[i].birthday);
-			var month = birthdayTime.getMonth() + 1;
-			var day = birthdayTime.getDate();
-			var year = birthdayTime.getFullYear();
-			var date = day + "-" + month + "-" + year;
-		} else {
-			var date = "";
-		}
-		
-		data['employee'].push({'id' : jsonArray[i].id, 'sex' : jsonArray[i].sex, 'name' : jsonArray[i].name,'position' : jsonArray[i].position , 'birthday' : date, 'nationality' : jsonArray[i].nationality, 'checked' : false});
-		stt[i] = i+1;
-	}
 	
 	//Config datepicker
 	jQuery('.datepicker').datepicker({
@@ -260,6 +265,7 @@ jQuery(document).ready(function() {
 	
 	//Catch event click select option
 	jQuery("select[name='filter-emp']").on('change', function(event) {
+		jQuery('#bt-filter-ei').removeClass("disabled");
 		var value = jQuery(this).val();
 		if(value != 'sl-empty') {
 			disableOption(value);
@@ -295,7 +301,9 @@ jQuery(document).ready(function() {
 	jQuery('button#bt-delete-ei').click(function(event) {
 		
 		hideElement();
+
 		showOption();
+		jQuery('#bt-filter-ei').addClass("disabled");
 		jQuery("select[name='filter-emp'] option[value='sl-empty']").prop('selected', true);
 		jQuery('.pagination').show();
 		
@@ -367,6 +375,7 @@ jQuery(document).ready(function() {
 
 				checked.parent().parent().remove();
 				jQuery('.full-contain input[name="check-all-main"]').prop('checked', false);
+				
 				//console.log("length " + data.employee.length + ' ' + number_delete);
 				for(var i=0; i < data.employee.length; i++) {
 					if(data.employee[i].id === number_delete) {
@@ -387,8 +396,10 @@ jQuery(document).ready(function() {
 					} 
 				}
 			});
+			
 			sortIdEmployee(stt);
 			initPagination(numberRowOfPage);
+			jQuery('.full-contain input[name="check-all"]').prop('checked', false);
 			//console.log(data.employee);
 		} else {
 			
@@ -396,45 +407,171 @@ jQuery(document).ready(function() {
 	});
 	
 	//Set value for modal edit employee
-	jQuery('#page2').on('click', 'a[name="modalEmp"]', function(event) {
+	jQuery('#page2').on('click', 'a[name="modalEmp"]', function(event) {		
 		var parent = jQuery(this).parent().parent();
 		var modal = jQuery('#myModal');
 		
 		//Set input id a value
 		var id = parent.find('td.table-id').text();
-		modal.find('input[name="id"]').attr('value', id);
+		modal.find('input[name="id"]').val(id);
 		
-		//Set input EmpId a value
+		//Set select sex a value
 		var sex = parent.find('td.table-sex').text();
-		modal.find('input[name="sex"]').attr('value', sex);
+		modal.find('select[name="sex"]').val(sex);
+		modal.find('select[name="sex"] option').each(function(i, e) {
+			if(jQuery(this).val() == sex) {
+				jQuery(this).prop('selected', true);
+			}
+		});
 		
 		//Set input Name a value
 		var name = parent.find('td > a[name="modalEmp"]').text();
-		modal.find('input[name="name"]').attr('value', name);
+		modal.find('input[name="name"]').val(name);
 		
 		//Set input Position a value
 		var position = parent.find('td.table-position').text();
-		modal.find('input[name="position"]').attr('value', position);
+		modal.find('input[name="position"]').val(position);
 		
 		//Set input Birthday a value
 		var birthday = parent.find('td.table-birthday').text();
-		modal.find('input[name="birthday"]').attr('value', birthday);
+		modal.find('input[name="birthday"]').val(birthday);
 		
 		//Set input Nationality a value
 		var nation = parent.find('td.table-nationality').text();
-		modal.find('select[name="nationality"]').find('option:first-child').attr('value', nation);
+		modal.find('select[name="nationality"]').find('option:first-child').val(nation);
 		modal.find('select[name="nationality"]').find('option:first-child').text(nation);
 		
 		//console.log(id);
 	});
 	
 	//Edit event
-	jQuery('#myModal form').submit(function(event) {
+	jQuery('#myModal').on('click', 'input[type="submit"]', function(event) {
+		jQuery('#example').find("td.table-id").parent().css("background-color", "white");
+		event.preventDefault();
 		var birthday = jQuery('#myModal').find('input[name="birthday"]');
 		var dateTime = new Date(birthday.datepicker("getDate"));
 		var strDateTime = dateTime.getFullYear() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getDate();
+		
 		jQuery('#myModal').find('input[name="birthday"]').val(strDateTime);
 		jQuery('#myModal').find('select[name="nationality"]').find('option:selected').prop('disabled', false);
+		
+		//Create a array to use post to server
+		var editArray = {
+			'id' : jQuery('#myModal').find('input[name="id"]').val(),
+			'sex': jQuery('#myModal').find('select[name="sex"] option:selected').val(),
+			'name': jQuery('#myModal').find('input[name="name"]').val(),
+			'position': jQuery('#myModal').find('input[name="position"]').val(),
+			'birthday': jQuery('#myModal').find('input[name="birthday"]').val(),
+			'nationality': jQuery('#myModal').find('select[name="nationality"] option:selected').val()
+		};
+	
+		jQuery.ajax({
+			contentType : 'application/json; charset=utf-8',
+			type : 'POST',
+			url: '/batis/edit',
+			dataType: 'json',
+			data:  JSON.stringify(editArray), //Must Stringtify object
+			success: function(result) {
+				jQuery('#myModal').modal('hide');
+				var currentPagination = jQuery('#myPager').find('li.active > a');
+				console.log("page: " + currentPagination.text());
+				
+				//Get old value
+				var name, sex, position, birthday, nationality, newBirthday;
+				
+				//Update array in javascript and don't reload page
+				for ( var i in data['employee']) {
+					if(data.employee[i].id == result.id) {
+						if(data.employee[i].name != result.name) {
+							name = data.employee[i].name;
+							data.employee[i].name = result.name;
+						}
+						if(data.employee[i].sex != result.sex) {
+							sex = data.employee[i].sex;
+							data.employee[i].sex = result.sex;
+						}
+						if(data.employee[i].position != result.position) {
+							position = data.employee[i].position;
+							data.employee[i].position = result.position;
+						}
+						if(data.employee[i].birthday != result.birthday) {
+							birthday = data.employee[i].birthday;
+							
+							var dateTime = new Date(result.birthday);
+							//Change format date: dd/mm/yyyy
+							var strDateTime = dateTime.getDate() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getFullYear();
+							newBirthday = strDateTime;
+							data.employee[i].birthday = strDateTime;
+						}
+						if(data.employee[i].nationality != result.nationality) {
+							nationality = data.employee[i].nationality;
+							data.employee[i].nationality = result.nationality;
+						}
+						break;
+					}
+					
+				}
+				console.log(name + " " + sex + " " + position + " " + birthday + " " + nationality);
+//				if(typeof position === "undefined") {
+//					alert('ec');
+//				}
+				//Reload employee table and show background color this row on table
+				var numberRow = 5;
+				initPagination(numberRow);
+				//Reference to pagination which contains this row on table
+				if(parseInt(currentPagination.text()) != 1) {
+					jQuery('#myPager').find('li > a').filter(function() {
+						return jQuery(this).text() == currentPagination.text();
+					}).click();
+				}
+				jQuery('#pagination-number option[value='+numberRow+']').prop('selected', true);
+				
+				//Add css for row edited
+				jQuery('#example').find("td.table-id").filter(function() {
+					return jQuery(this).text() == result.id;
+				}).parent().addClass('info');
+				
+				//Show background column has changed
+				if(!(typeof name === "undefined")) {
+					jQuery('#example').find("td.table-name").filter(function() {
+						return jQuery(this).parent().find('.table-id').text() == result.id;
+					}).css('background-color', "#E8ACAC");
+				}
+				
+				//Show background column has changed
+				if(!(typeof sex === "undefined")) {
+					jQuery('#example').find("td.table-sex").filter(function() {
+						return jQuery(this).parent().find('.table-id').text() == result.id;
+					}).css('background-color', "#E8ACAC");
+				}
+				
+				//Show background column has changed
+				if(!(typeof position === "undefined")) {
+					jQuery('#example').find("td.table-position").filter(function() {
+						return jQuery(this).parent().find('.table-id').text() == result.id;
+					}).css('background-color', "#E8ACAC");
+				}
+				
+				//Show background column has changed
+				if(birthday != newBirthday) {
+					jQuery('#example').find("td.table-birthday").filter(function() {
+						return jQuery(this).parent().find('.table-id').text() == result.id;
+					}).css('background-color', "#E8ACAC");
+				}
+				
+				//Show background column has changed
+				if(!(typeof nationality === "undefined")) {
+					jQuery('#example').find("td.table-nationality").filter(function() {
+						return jQuery(this).parent().find('.table-id').text() == result.id;
+					}).css('background-color', "#E8ACAC");
+				}
+				
+				
+				
+			}
+		});
+		
+	
 	});
 	
 	
@@ -648,103 +785,110 @@ jQuery(document).ready(function() {
 	/*
 	 * Config for filter part
 	 */
+	//First init: disable button when you don't choose ability to search
+	if(jQuery('#span-ei-id').css('display') == 'none' && jQuery('#span-ei-name').css('display') == 'none' && jQuery('#span-ei-date').css('display') == 'none') {
+		jQuery('#bt-filter-ei').addClass("disabled");
+	}
 	//Apply button for filter employee
 	jQuery('#action-epm #bt-filter-ei').on('click', function(event) {
 		event.preventDefault();
-		jQuery('#modalFailed .modal-header').find('h4').text("This employee is not found!");
-		
-		var dataFilter = {};
-		//Get id
-		if(jQuery('#span-ei-id').css('display') != 'none') {
-			var checkId = jQuery('#span-ei-id').find('input[type="checkbox"]').prop('checked');
-			if(checkId === false) {
-				if(jQuery('#span-ei-id').find('input[name="ei-id"]').val() == "") {
-					jQuery('#span-ei-id').find('input[name="ei-id"]').focus();
-					return false;
-				} else {
-					dataFilter['id'] = jQuery('#span-ei-id').find('input[name="ei-id"]').val();
-				}	
-			}
-		}
-		//Get name
-		if(jQuery('#span-ei-name').css('display') != 'none') {
-			var checkName = jQuery('#span-ei-name').find('input[type="checkbox"]').prop('checked');
-			if(checkName === false) {
-				if(jQuery('#span-ei-name').find('input[name="ei-name"]').val() == "") {
-					jQuery('#span-ei-name').find('input[name="ei-name"]').focus();
-					return false;
-				} else {
-					dataFilter['name'] = jQuery('#span-ei-name').find('input[name="ei-name"]').val();
-				}	
-			}
-		}
-		
-		//Get date
-		if(jQuery('#span-ei-date').css('display') != 'none') {
-			var checkDate = jQuery('#span-ei-date').find('input[type="checkbox"]').prop('checked');
-			if(checkDate === false ) {
-				if(jQuery('#span-ei-date').find('input[name="ei-birthdate"]').val() == "") {
-					jQuery('#span-ei-date').find('input[name="ei-birthdate"]').focus();
-					return false;
-				} else {
-					var dateTime = new Date(jQuery('#span-ei-date').find('input[name="ei-birthdate"]').datepicker("getDate"));
-					var strDateTime = dateTime.getFullYear() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getDate();
-					dataFilter['birthday'] = strDateTime;
-				}
+		if(!jQuery(this).hasClass('disabled')) {
+			jQuery('#modalFailed .modal-header').find('h4').text("This employee is not found!");
 			
-			}
-		}
-		console.log(dataFilter);
-		jQuery.ajax({
-			contentType : 'application/json; charset=utf-8',
-			type : 'POST',
-			url: '/batis/filter',
-			dataType: 'json',
-			data: JSON.stringify(dataFilter),
-			success: function(data) {
-				if(data != null && data.length > 0 ) {
-					var sttFilter = [];
-					
-					jQuery('#tr-header').nextUntil('#table-lastrow').remove();
-					jQuery('.pagination').hide();
-					for(var i=0; i<data.length; i++) {
-						sttFilter[i] = parseInt(i) + 1;
-						var birthdayTime = new Date(data[i].birthday);
-						var month = birthdayTime.getMonth() + 1;
-						var day = birthdayTime.getDate();
-						var year = birthdayTime.getFullYear();
-						var date = day + "-" + month + "-" + year;
-						jQuery('#table-lastrow').before("<tr>" + 
-								"<th><input type='checkbox' name='check-all' value=''></th>"
-								+"<td class='table-stt'>"+sttFilter[i]+"</td>"
-								+"<td class='table-id'>"+(data[i].id)+"</td>"
-								+"<td class='table-sex'>"+(data[i].sex)+"</td>"
-								+"<td><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data[i].name+"</a></td>"
-								+"<td class='table-position'>"+(data[i].position)+"</td>"
-								+"<td class='table-birthday'>"+(date)+"</td>"
-								+"<td class='table-nationality'>"+(data[i].nationality)+"</td>"
-								+"</tr>");
-						
-					}
-				} else {
-					jQuery('#myNavbar li').find('a[href="#function2"]').click();
-					jQuery('#tr-header').nextUntil('#table-lastrow').remove();
-					jQuery('#modalFailed').modal({
-						show : 'true',
-						backdrop: false
-					});
-					jQuery('#tr-header').after('<tr><td colspan="8"><div style="text-align:center" class="alert alert-info">Empty Employee</div></td></tr>');
-					jQuery('.pagination').hide();
+			var dataFilter = {};
+			//Get id
+			if(jQuery('#span-ei-id').css('display') != 'none') {
+				var checkId = jQuery('#span-ei-id').find('input[type="checkbox"]').prop('checked');
+				if(checkId === false) {
+					if(jQuery('#span-ei-id').find('input[name="ei-id"]').val() == "") {
+						jQuery('#span-ei-id').find('input[name="ei-id"]').focus();
+						return false;
+					} else {
+						dataFilter['id'] = jQuery('#span-ei-id').find('input[name="ei-id"]').val();
+					}	
 				}
 			}
-		});
-		if(jQuery('#span-ei-id').css('display') != "none" && jQuery('#span-ei-id input[name="ei-id"]').val().length <= 0 ||
-			jQuery('#span-ei-name').css('display') != "none" && jQuery('#span-ei-name input[name="ei-name"]').val().length <= 0 ||
-			jQuery('#span-ei-date').css('display') != "none" && jQuery('#span-ei-date input[name="ei-birthdate"]').val().length <= 0) {
-			jQuery('#modalFailed .modal-header').find('h4').text("Error: A or more your input is empty or this employee is not exist ! If you don't use this field, please check into checkbox!");
-			loadTableEmployee(data);
+			//Get name
+			if(jQuery('#span-ei-name').css('display') != 'none') {
+				var checkName = jQuery('#span-ei-name').find('input[type="checkbox"]').prop('checked');
+				if(checkName === false) {
+					if(jQuery('#span-ei-name').find('input[name="ei-name"]').val() == "") {
+						jQuery('#span-ei-name').find('input[name="ei-name"]').focus();
+						return false;
+					} else {
+						dataFilter['name'] = jQuery('#span-ei-name').find('input[name="ei-name"]').val();
+					}	
+				}
+			}
+			
+			//Get date
+			if(jQuery('#span-ei-date').css('display') != 'none') {
+				var checkDate = jQuery('#span-ei-date').find('input[type="checkbox"]').prop('checked');
+				if(checkDate === false ) {
+					if(jQuery('#span-ei-date').find('input[name="ei-birthdate"]').val() == "") {
+						jQuery('#span-ei-date').find('input[name="ei-birthdate"]').focus();
+						return false;
+					} else {
+						var dateTime = new Date(jQuery('#span-ei-date').find('input[name="ei-birthdate"]').datepicker("getDate"));
+						var strDateTime = dateTime.getFullYear() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getDate();
+						dataFilter['birthday'] = strDateTime;
+					}
+				
+				}
+			}
+			console.log(dataFilter);
+			jQuery.ajax({
+				contentType : 'application/json; charset=utf-8',
+				type : 'POST',
+				url: '/batis/filter',
+				dataType: 'json',
+				data: JSON.stringify(dataFilter),
+				success: function(data) {
+					if(data != null && data.length > 0 ) {
+						var sttFilter = [];
+						
+						jQuery('#tr-header').nextUntil('#table-lastrow').remove();
+						jQuery('.pagination').hide();
+						for(var i=0; i<data.length; i++) {
+							sttFilter[i] = parseInt(i) + 1;
+							var birthdayTime = new Date(data[i].birthday);
+							var month = birthdayTime.getMonth() + 1;
+							var day = birthdayTime.getDate();
+							var year = birthdayTime.getFullYear();
+							var date = day + "-" + month + "-" + year;
+							jQuery('#table-lastrow').before("<tr>" + 
+									"<th><input type='checkbox' name='check-all' value=''></th>"
+									+"<td class='table-stt'>"+sttFilter[i]+"</td>"
+									+"<td class='table-id'>"+(data[i].id)+"</td>"
+									+"<td class='table-sex'>"+(data[i].sex)+"</td>"
+									+"<td class='table-name'><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data[i].name+"</a></td>"
+									+"<td class='table-position'>"+(data[i].position)+"</td>"
+									+"<td class='table-birthday'>"+(date)+"</td>"
+									+"<td class='table-nationality'>"+(data[i].nationality)+"</td>"
+									+"</tr>");
+							
+						}
+					} else {
+						jQuery('#myNavbar li').find('a[href="#function2"]').click();
+						jQuery('#tr-header').nextUntil('#table-lastrow').remove();
+//						jQuery('#modalFailed').modal({
+//							show : 'true',
+//							backdrop: false
+//						});
+						jQuery('#tr-header').after('<tr><td colspan="8"><div style="text-align:center" class="alert alert-info">Empty Employee</div></td></tr>');
+						jQuery('.pagination').hide();
+					}
+				}
+			});
+//			if(jQuery('#span-ei-id').css('display') != "none" && jQuery('#span-ei-id input[name="ei-id"]').val().length <= 0 ||
+//				jQuery('#span-ei-name').css('display') != "none" && jQuery('#span-ei-name input[name="ei-name"]').val().length <= 0 ||
+//				jQuery('#span-ei-date').css('display') != "none" && jQuery('#span-ei-date input[name="ei-birthdate"]').val().length <= 0) {
+//				jQuery('#modalFailed .modal-header').find('h4').text("Error: A or more your input is empty or this employee is not exist ! If you don't use this field, please check into checkbox!");
+//				loadTableEmployee(data);
+//			}
+			
+			
 		}
-		
 		
 	});
 	
@@ -757,7 +901,7 @@ jQuery(document).ready(function() {
 			//Check not null
 			if(jQuery(this).val().length <= 0) {
 				jQuery(this).attr("data-original-title", "Please don't go T_T");
-				jQuery(this).attr("data-content", "Your text needs more than 1 number.");
+				jQuery(this).attr("data-content", "Your text needs a 1 number.");
 				jQuery(this).focus();
 			}
 			if(/^[0-9]+$/.test(jQuery(this).val()) == false) {
@@ -766,7 +910,7 @@ jQuery(document).ready(function() {
 				jQuery(this).focus();
 			} else {
 				jQuery(this).attr("data-original-title", "Good");
-				jQuery(this).attr("data-content", "Your test is right syntax");
+				jQuery(this).attr("data-content", "Your text is right syntax");
 			}
 			jQuery(this).css({
 				'border': '1px solid #ccc',
@@ -866,6 +1010,8 @@ jQuery('#addnew').on('blur', 'input[name="birthday"]', function(event) {
 	//Hide fieldset and button
 	function hideElement() {
 		jQuery("fieldset > span#span-ei-id, span#span-ei-name, span#span-ei-date").hide();
+		jQuery("fieldset > span#span-ei-id input[type='checkbox'], span#span-ei-name input[type='checkbox'], span#span-ei-date input[type='checkbox']").prop('checked', false);
+		jQuery("fieldset > span#span-ei-id input[name='ei-id'], span#span-ei-name input[name='ei-name'], span#span-ei-date input[name='ei-birthdate']").css('display','block');
 		jQuery("fieldset > span#span-ei-id input[name='ei-id'], span#span-ei-name input[name='ei-name'], span#span-ei-date input[name='ei-birthdate']").val('');
 		
 	}
@@ -896,7 +1042,7 @@ jQuery('#addnew').on('blur', 'input[name="birthday"]', function(event) {
 				+"<td class='table-stt'>"+(data.employee[i].stt)+"</td>"
 				+"<td class='table-id'>"+(data.employee[i].id)+"</td>"
 				+"<td class='table-sex'>"+(data.employee[i].sex)+"</td>"
-				+"<td><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data.employee[i].name+"</a></td>"
+				+"<td class='table-name'><a href='#' name='modalEmp' data-toggle='modal' data-target='#myModal' title='Click to edit!'>"+data.employee[i].name+"</a></td>"
 				+"<td class='table-position'>"+(data.employee[i].position)+"</td>"
 				+"<td class='table-birthday'>"+(data.employee[i].birthday)+"</td>"
 				+"<td class='table-nationality'>"+(data.employee[i].nationality)+"</td>"

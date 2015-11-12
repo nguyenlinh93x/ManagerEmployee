@@ -83,12 +83,20 @@ public class EmployeeController {
 	}
 
 	// Edit employee
-	@RequestMapping(value = "/edit", method = RequestMethod.POST)
-	public String editEmployee(Model model, Employee employee) {
+	@RequestMapping(value = "/edit", method = RequestMethod.POST, consumes="application/json", produces="application/json;charset=UTF-8")
+	public @ResponseBody Employee editEmployee(Model model,@RequestBody Employee employee) {
 		// System.out.println(employee);
 		employeeService.updateEmployee(employee);
-		return "home";
+		return employee;
 	}
+	
+//	// Edit employee
+//	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+//	public @ResponseBody String editEmployeeAjax(Model model, Employee employee) {
+//		// System.out.println(employee);
+//		employeeService.updateEmployee(employee);
+//		return "home";
+//	}
 
 	// Filter employee
 	@RequestMapping(value = "/filter", method = RequestMethod.POST,consumes="application/json" ,produces = "application/json;charset=UTF-8")

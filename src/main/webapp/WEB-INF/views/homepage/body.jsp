@@ -141,7 +141,7 @@
 			  <div class="modal-dialog">
 			    <!-- Modal content-->
 			    <div class="modal-content">
-			    <form role="form" action="${pageContext.request.contextPath }/edit" method="post">
+			 
 			      <div class="modal-header">
 			        <button type="button" class="close" data-dismiss="modal">&times;</button>
 			        <h4 class="modal-title" style="color: blue;">Edit Employee</h4>
@@ -153,7 +153,11 @@
 			      	</div>
 			      	<div class="form-group">
 			      		<label for="sex">Sex:</label>
-			      		<input type="text" class="form-control" name="sex" placeholder="Your id" required="required">
+			      		<select  class='table-sex-select form-control' name='sex'>
+			      			<option name='sex'></option>
+			      			<option name='sex' value='Male'>Male</option>
+			      			<option name='sex' value='Female'>Female</option>
+			      		</select>
 			      	</div>
 			      	<div class="form-group has-success has-feedback">
 			      		<label for="name">Full name:</label>
@@ -162,17 +166,17 @@
 			      	</div>
 			      	<div class="form-group has-success has-feedback">
 			      		<label for="position">Position:</label>
-			      		<input type="text" class="form-control" name="position" placeholder="Your position" required="required">
+			      		<input type="text" class="form-control" name="position" placeholder="Your position">
 			      		<span class="glyphicon glyphicon-ok form-control-feedback">
 			      	</div>
 			      	<div class="form-group  has-success has-feedback">
 			      		<label for="birthday:">Birthday:</label>
-			      		<input type="text" class="form-control datepicker" name="birthday" placeholder="mm-dd-yyyy" required="required">
+			      		<input type="text" class="form-control datepicker" name="birthday" placeholder="mm-dd-yyyy">
 			      		<span class="glyphicon glyphicon-ok form-control-feedback">
 			      	</div>
 			      	<div class="form-group">
 			      		<label for="nationality:">Nationality:</label>
-			      		<select class="form-control" name="nationality" required="required">
+			      		<select class="form-control" name="nationality">
 			      		  	<option disabled selected value=""></option>
 						    <option value="VN">VN</option>
 						    <option value="USA">USA</option>
@@ -184,7 +188,7 @@
 			       <input type="submit" class="btn btn-primary" value="OK">
 			       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			      </div>
-			      </form>
+			   
 			    </div>
 			
 			  </div>
