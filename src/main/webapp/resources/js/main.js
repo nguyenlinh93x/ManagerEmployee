@@ -589,7 +589,11 @@ jQuery(document).ready(function() {
 //					}
 					//Reload employee table and show background color this row on table
 					if(jQuery('#bt-filter-ei').hasClass('disabled')) {
-						var numberRow = 5;
+						 
+						var numberRow = jQuery('#pagination-number option:selected').val();
+						if(numberRow = "all") {
+							numberRow = data['employee'].length;
+						}
 						initPagination(numberRow);
 						//Reference to pagination which contains this row on table
 						if(parseInt(currentPagination.text()) != 1) {
@@ -647,7 +651,7 @@ jQuery(document).ready(function() {
 						if(!(typeof name === "undefined")) {
 							jQuery('#example').find("td.table-name").filter(function() {
 								return jQuery(this).parent().find('.table-id').text() == result.id;
-							}).text(result.name).css('background-color', "#E8ACAC");
+							}).find('a[name="modalEmp"]').text(result.name).parent().css('background-color', "#E8ACAC");
 						}
 						
 						//Show background column has changed
