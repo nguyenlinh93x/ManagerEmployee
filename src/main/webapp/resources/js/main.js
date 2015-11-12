@@ -88,6 +88,7 @@ jQuery(document).ready(function() {
 	var numberRowOfPage = 5;
 	//Set numberRowOfPage when user change value
 	jQuery("select#pagination-number").on('change', function(event) {
+		jQuery('#bt-filter-ei').addClass('disabled');
 		//console.log(jQuery(this).val());
 		if(jQuery(this).val() == 'all') {
 			numberRowOfPage = data['employee'].length;
@@ -407,7 +408,7 @@ jQuery(document).ready(function() {
 	});
 	
 	//Set value for modal edit employee
-	jQuery('#page2').on('click', 'a[name="modalEmp"]', function(event) {		
+	jQuery('#page2').on('click', 'a[name="modalEmp"]', function(event) {	
 		var parent = jQuery(this).parent().parent();
 		var modal = jQuery('#myModal');
 		
@@ -444,134 +445,244 @@ jQuery(document).ready(function() {
 		//console.log(id);
 	});
 	
+	/*
+	 * Vadidate Edit field
+	 */
+	//Vadidate name
+	jQuery('#myModal').on('blur', 'input[name="name"]', function(event) {
+		//Check text has special character and contains UTF-8: \u00A1-\uFFFF
+		if(/^\s*$/.test(jQuery(this).val()) == true) {
+			//Show alert and show on page
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your name can\'t empty!</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else if((/^[\w\u00A1-\uFFFF]+[\w\u00A1-\uFFFF ]*$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
+			//Show alert and show on page
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your name can\'t contain special character!</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		//If length of text > 45 character is unvalid
+		} else if(jQuery(this).val().length > 45) {
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your name too long. Max: 45 character.</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		//If Satisfy condition, we'll hide the alert
+		} else {
+			jQuery('#edit-alert').addClass('hide');
+		}
+		if(jQuery(this).val() != "") {
+			jQuery(this).css('border','1px solid #ccc');
+		}
+	});
+
+	//Vadidate position
+	jQuery('#myModal').on('blur', 'input[name="position"]', function(event) {
+		//Text is not contain special character
+		if((/^[\w\u00A1-\uFFFF]+[\w\u00A1-\uFFFF ]*$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your position can\'t contain special character!</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else if(jQuery(this).val().length > 60) {
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your position too long. Max: 60 character.</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else {
+			jQuery('#edit-alert').addClass('hide');
+		}
+	});
+
+	//Vadidate date
+	jQuery('#myModal').on('blur', 'input[name="birthday"]', function(event) {
+		
+		if(/^[0-9]{2}\-[0-9]{2}\-[0-9]{4}$/.test(jQuery(this).val()) == false && jQuery(this).val() != "") {
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your date is unvalid!</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else {
+			jQuery('#edit-alert').addClass('hide');
+		}
+	});
+	
 	//Edit event
 	jQuery('#myModal').on('click', 'input[type="submit"]', function(event) {
-		jQuery('#example').find("td.table-id").parent().css("background-color", "white");
-		event.preventDefault();
-		var birthday = jQuery('#myModal').find('input[name="birthday"]');
-		var dateTime = new Date(birthday.datepicker("getDate"));
-		var strDateTime = dateTime.getFullYear() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getDate();
+		var currentDate = new Date();
+		console.log("current: " + currentDate);
+		var dateTime = new Date(jQuery('#myModal input[name="birthday"]').datepicker("getDate"));
+		console.log("br: " + dateTime);
+		if(dateTime >= currentDate) {
+			jQuery('#edit-alert').html('<strong>Error:</strong> <span> Your date can\'t not larger than current date!</span>');
+			jQuery('#edit-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else {
+			jQuery('#edit-alert').addClass('hide');
+		}
+		//If input don't have error
+		if(jQuery('#edit-alert').hasClass('hide')) {
+			jQuery('#example').find("td.table-id").parent().css("background-color", "white");
+			event.preventDefault();
+			var birthday = jQuery('#myModal').find('input[name="birthday"]');
+			var dateTime = new Date(birthday.datepicker("getDate"));
+			var strDateTime = dateTime.getFullYear() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getDate();
+			
+			jQuery('#myModal').find('input[name="birthday"]').val(strDateTime);
+			jQuery('#myModal').find('select[name="nationality"]').find('option:selected').prop('disabled', false);
+			
+			//Create a array to use post to server
+			var editArray = {
+				'id' : jQuery('#myModal').find('input[name="id"]').val(),
+				'sex': jQuery('#myModal').find('select[name="sex"] option:selected').val(),
+				'name': jQuery('#myModal').find('input[name="name"]').val(),
+				'position': jQuery('#myModal').find('input[name="position"]').val(),
+				'birthday': jQuery('#myModal').find('input[name="birthday"]').val(),
+				'nationality': jQuery('#myModal').find('select[name="nationality"] option:selected').val()
+			};
 		
-		jQuery('#myModal').find('input[name="birthday"]').val(strDateTime);
-		jQuery('#myModal').find('select[name="nationality"]').find('option:selected').prop('disabled', false);
-		
-		//Create a array to use post to server
-		var editArray = {
-			'id' : jQuery('#myModal').find('input[name="id"]').val(),
-			'sex': jQuery('#myModal').find('select[name="sex"] option:selected').val(),
-			'name': jQuery('#myModal').find('input[name="name"]').val(),
-			'position': jQuery('#myModal').find('input[name="position"]').val(),
-			'birthday': jQuery('#myModal').find('input[name="birthday"]').val(),
-			'nationality': jQuery('#myModal').find('select[name="nationality"] option:selected').val()
-		};
-	
-		jQuery.ajax({
-			contentType : 'application/json; charset=utf-8',
-			type : 'POST',
-			url: '/batis/edit',
-			dataType: 'json',
-			data:  JSON.stringify(editArray), //Must Stringtify object
-			success: function(result) {
-				jQuery('#myModal').modal('hide');
-				var currentPagination = jQuery('#myPager').find('li.active > a');
-				console.log("page: " + currentPagination.text());
-				
-				//Get old value
-				var name, sex, position, birthday, nationality, newBirthday;
-				
-				//Update array in javascript and don't reload page
-				for ( var i in data['employee']) {
-					if(data.employee[i].id == result.id) {
-						if(data.employee[i].name != result.name) {
-							name = data.employee[i].name;
-							data.employee[i].name = result.name;
-						}
-						if(data.employee[i].sex != result.sex) {
-							sex = data.employee[i].sex;
-							data.employee[i].sex = result.sex;
-						}
-						if(data.employee[i].position != result.position) {
-							position = data.employee[i].position;
-							data.employee[i].position = result.position;
-						}
-						if(data.employee[i].birthday != result.birthday) {
-							birthday = data.employee[i].birthday;
-							
-							var dateTime = new Date(result.birthday);
-							//Change format date: dd/mm/yyyy
-							var strDateTime = dateTime.getDate() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getFullYear();
-							newBirthday = strDateTime;
-							data.employee[i].birthday = strDateTime;
-						}
-						if(data.employee[i].nationality != result.nationality) {
-							nationality = data.employee[i].nationality;
-							data.employee[i].nationality = result.nationality;
-						}
-						break;
-					}
+			jQuery.ajax({
+				contentType : 'application/json; charset=utf-8',
+				type : 'POST',
+				url: '/batis/edit',
+				dataType: 'json',
+				data:  JSON.stringify(editArray), //Must Stringtify object
+				success: function(result) {
+					jQuery('#myModal').modal('hide');
+					var currentPagination = jQuery('#myPager').find('li.active > a');
+					console.log("page: " + currentPagination.text());
 					
-				}
-				console.log(name + " " + sex + " " + position + " " + birthday + " " + nationality);
-//				if(typeof position === "undefined") {
-//					alert('ec');
-//				}
-				//Reload employee table and show background color this row on table
-				var numberRow = 5;
-				initPagination(numberRow);
-				//Reference to pagination which contains this row on table
-				if(parseInt(currentPagination.text()) != 1) {
-					jQuery('#myPager').find('li > a').filter(function() {
-						return jQuery(this).text() == currentPagination.text();
-					}).click();
-				}
-				jQuery('#pagination-number option[value='+numberRow+']').prop('selected', true);
-				
-				//Add css for row edited
-				jQuery('#example').find("td.table-id").filter(function() {
-					return jQuery(this).text() == result.id;
-				}).parent().addClass('info');
-				
-				//Show background column has changed
-				if(!(typeof name === "undefined")) {
-					jQuery('#example').find("td.table-name").filter(function() {
-						return jQuery(this).parent().find('.table-id').text() == result.id;
-					}).css('background-color', "#E8ACAC");
-				}
-				
-				//Show background column has changed
-				if(!(typeof sex === "undefined")) {
-					jQuery('#example').find("td.table-sex").filter(function() {
-						return jQuery(this).parent().find('.table-id').text() == result.id;
-					}).css('background-color', "#E8ACAC");
-				}
-				
-				//Show background column has changed
-				if(!(typeof position === "undefined")) {
-					jQuery('#example').find("td.table-position").filter(function() {
-						return jQuery(this).parent().find('.table-id').text() == result.id;
-					}).css('background-color', "#E8ACAC");
-				}
-				
-				//Show background column has changed
-				if(birthday != newBirthday) {
-					jQuery('#example').find("td.table-birthday").filter(function() {
-						return jQuery(this).parent().find('.table-id').text() == result.id;
-					}).css('background-color', "#E8ACAC");
-				}
-				
-				//Show background column has changed
-				if(!(typeof nationality === "undefined")) {
-					jQuery('#example').find("td.table-nationality").filter(function() {
-						return jQuery(this).parent().find('.table-id').text() == result.id;
-					}).css('background-color', "#E8ACAC");
-				}
-				
-				
-				
-			}
-		});
+					//Get old value
+					var name, sex, position, birthday, nationality, newBirthday;
+					
+					//Update array in javascript and don't reload page
+					for ( var i in data['employee']) {
+						if(data.employee[i].id == result.id) {
+							if(data.employee[i].name != result.name) {
+								name = data.employee[i].name;
+								data.employee[i].name = result.name;
+							}
+							if(data.employee[i].sex != result.sex) {
+								sex = data.employee[i].sex;
+								data.employee[i].sex = result.sex;
+							}
+							if(data.employee[i].position != result.position) {
+								position = data.employee[i].position;
+								data.employee[i].position = result.position;
+							}
+							if(data.employee[i].birthday != result.birthday) {
+								birthday = data.employee[i].birthday;
+								
+								var dateTime = new Date(result.birthday);
+								//Change format date: dd/mm/yyyy
+								var strDateTime = dateTime.getDate() + "-" + (dateTime.getMonth()+1) + "-" + dateTime.getFullYear();
+								newBirthday = strDateTime;
+								data.employee[i].birthday = strDateTime;
+							}
+							if(data.employee[i].nationality != result.nationality) {
+								nationality = data.employee[i].nationality;
+								data.employee[i].nationality = result.nationality;
+							}
+							break;
+						}
+						
+					}
+					console.log(name + " " + sex + " " + position + " " + birthday + " " + nationality);
+//					if(typeof position === "undefined") {
+//						alert('ec');
+//					}
+					//Reload employee table and show background color this row on table
+					if(jQuery('#bt-filter-ei').hasClass('disabled')) {
+						var numberRow = 5;
+						initPagination(numberRow);
+						//Reference to pagination which contains this row on table
+						if(parseInt(currentPagination.text()) != 1) {
+							jQuery('#myPager').find('li > a').filter(function() {
+								return jQuery(this).text() == currentPagination.text();
+							}).click();
+						}
+						jQuery('#pagination-number option[value='+numberRow+']').prop('selected', true);
+						//Add css for row edited
+						jQuery('#example').find("td.table-id").filter(function() {
+							return jQuery(this).text() == result.id;
+						}).parent().addClass('info');
+						
+						//Show background column has changed
+						if(!(typeof name === "undefined")) {
+							jQuery('#example').find("td.table-name").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof sex === "undefined")) {
+							jQuery('#example').find("td.table-sex").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof position === "undefined")) {
+							jQuery('#example').find("td.table-position").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(birthday != newBirthday) {
+							jQuery('#example').find("td.table-birthday").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof nationality === "undefined")) {
+							jQuery('#example').find("td.table-nationality").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).css('background-color', "#E8ACAC");
+						}
+					} else { //Catch in search table which we edit
+						//Add css for row edited
+						jQuery('#example').find("td.table-id").filter(function() {
+							return jQuery(this).text() == result.id;
+						}).parent().addClass('info');
+						
+						//Show background column has changed
+						if(!(typeof name === "undefined")) {
+							jQuery('#example').find("td.table-name").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).text(result.name).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof sex === "undefined")) {
+							jQuery('#example').find("td.table-sex").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).text(result.sex).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof position === "undefined")) {
+							jQuery('#example').find("td.table-position").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).text(result.position).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(birthday != newBirthday) {
+							jQuery('#example').find("td.table-birthday").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).text(newBirthday).css('background-color', "#E8ACAC");
+						}
+						
+						//Show background column has changed
+						if(!(typeof nationality === "undefined")) {
+							jQuery('#example').find("td.table-nationality").filter(function() {
+								return jQuery(this).parent().find('.table-id').text() == result.id;
+							}).text(result.nationality).css('background-color', "#E8ACAC");
+						}
+					}
 		
-	
+				}
+			});
+			
+		}
 	});
 	
 	
@@ -606,7 +717,7 @@ jQuery(document).ready(function() {
 						//Convert back date javascript
 						var dateTime = new Date(thisTime.datepicker("getDate"));
 						//console.log("date: " + dateTime);
-						if(dateTime > currentDate) {
+						if(dateTime >= currentDate) {
 							thisTime.val("");
 							jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your date can\'t larger than current date!</span>');
 							jQuery('#addnew-alert').removeClass('hide');
@@ -876,7 +987,7 @@ jQuery(document).ready(function() {
 //							backdrop: false
 //						});
 						jQuery('#tr-header').after('<tr><td colspan="8"><div style="text-align:center" class="alert alert-info">Empty Employee</div></td></tr>');
-						jQuery('.pagination').hide();
+						//jQuery('.pagination').hide();
 					}
 				}
 			});

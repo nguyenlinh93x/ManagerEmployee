@@ -141,10 +141,11 @@
 			  <div class="modal-dialog">
 			    <!-- Modal content-->
 			    <div class="modal-content">
-			 
+			 	
 			      <div class="modal-header">
 			        <button type="button" class="close" data-dismiss="modal">&times;</button>
 			        <h4 class="modal-title" style="color: blue;">Edit Employee</h4>
+			        <div id="edit-alert" class="alert alert-danger hide fade in"></div>
 			      </div>
 			      <div class="modal-body">
 			      	<div class="form-group">
@@ -182,15 +183,15 @@
 						    <option value="USA">USA</option>
 			  			</select>
 			      	</div>
-			      
+			    
 			      </div>
 			      <div class="modal-footer">
 			       <input type="submit" class="btn btn-primary" value="OK">
 			       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			      </div>
-			   
+			    
 			    </div>
-			
+				
 			  </div>
 			</div>
 			
