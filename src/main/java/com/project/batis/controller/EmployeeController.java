@@ -60,10 +60,10 @@ public class EmployeeController {
 	}
 
 	// Get last id to get number for add row button
-	@RequestMapping(value = "getLastId", method = RequestMethod.GET)
-	public @ResponseBody int getLastId() {
-		return employeeService.getLastIdEmployee();
-	}
+//	@RequestMapping(value = "getLastId", method = RequestMethod.GET)
+//	public @ResponseBody int getLastId() {
+//		return employeeService.getLastIdEmployee();
+//	}
 
 	// Add employee to database
 	@RequestMapping(value = "/submitAdd", method = RequestMethod.POST,consumes="application/json" , produces = "application/json;charset=UTF-8")
@@ -123,4 +123,6 @@ public class EmployeeController {
 
 		return listOfFilter;
 	}
+	
+	
 }

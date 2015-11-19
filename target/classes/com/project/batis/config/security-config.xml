@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<import resource="classpath:/com/project/batis/config/dao-context.xml" />
+
+	<bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+		<property name="service"
+			value="http://localhost:8080/batis/j_spring_cas_security_check" />
+		<property name="sendRenew" value="false" />
+	</bean>
+
+	<security:ldap-server url="ldap://localhost:10389/o=ny"
+		manager-dn="uid=admin,ou=system" manager-password="secret" />
+
+	<security:http entry-point-ref="casEntryPoint"
+		use-expressions="true" disable-url-rewriting="true">
+		<!-- Authentication part -->
+		<security:intercept-url pattern="/"
+			access="isAuthenticated()" />
+		<security:intercept-url pattern="/addnew"
+			access="hasRole('ROLE_ADMIN')" />
+		<!-- Permit part -->
+		<security:intercept-url pattern="/resources/**"
+			access="permitAll" />
+		<security:intercept-url pattern="/login"
+			access="permitAll" />
+		<security:intercept-url pattern="/signup"
+			access="permitAll" />
+		<security:intercept-url pattern="/createaccount"
+			access="permitAll" />
+		<security:intercept-url pattern="/getJson"
+			access="permitAll" />
+		<security:intercept-url pattern="/delete/{id}"
+			access="permitAll" />
+		<security:intercept-url pattern="/updateTable/{id}/{change}"
+			access="permitAll" />
+		<security:intercept-url pattern="/edit" access="permitAll" />
+		<security:intercept-url pattern="/filter"
+			access="permitAll" />
+		<security:intercept-url pattern="/submitAdd"
+			access="permitAll" />
+		<!-- Deny part -->
+		<security:intercept-url pattern="/**" access="denyAll" />
+		<security:form-login login-page="/login"
+			authentication-failure-url="/login?error=true" password-parameter="password"
+			username-parameter="email" default-target-url="/"
+			always-use-default-target="true" />
+		<security:custom-filter position="CAS_FILTER"
+			ref="casFilter" />
+	</security:http>
+
+	<bean id="casFilter"
+		class="org.springframework.security.cas.web.CasAuthenticationFilter">
+		<property name="authenticationManager" ref="authenticationManager" />
+	</bean>
+
+	<bean id="casEntryPoint"
+		class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+		<property name="loginUrl" value="http://localhost:8080/batis/login" />
+		<property name="serviceProperties" ref="serviceProperties" />
+	</bean>
+
+	<context:property-placeholder
+		location="classpath:/com/project/batis/config/some.properties" />
+	
+	<security:authentication-manager alias="authenticationManager">
+		<!-- Login by JDBC -->
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource" users-by-username-query="${query.authentication}" />
+		</security:authentication-provider>	
+		<!-- Login by ldap -->
+		<!-- Login by mail or password -->
+		<security:ldap-authentication-provider user-search-filter="(|(mail={0})(uid={0}))" 
+			user-search-base="ou=users" group-search-filter="(uniqueMember={0})" group-search-base="ou=groups" 
+			group-role-attribute="cn"> </security:ldap-authentication-provider>
+			
+	</security:authentication-manager>
+
+	<bean id="casAuthenticationProvider"
+		class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+		<property name="authenticationUserDetailsService">
+			<bean
+				class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+				<constructor-arg ref="userService" />
+			</bean>
+		</property>
+		<property name="serviceProperties" ref="serviceProperties" />
+		<property name="ticketValidator">
+			<bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+				<constructor-arg index="0" value="http://localhost:8080/batis" />
+			</bean>
+		</property>
+		<property name="key" value="an_id_for_this_auth_provider_only" />
+	</bean>
+
+	<security:jdbc-user-service id="userService"
+		data-source-ref="dataSource" users-by-username-query="${query.authentication}" />
+
+</beans>

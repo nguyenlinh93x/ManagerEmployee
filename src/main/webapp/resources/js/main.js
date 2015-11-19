@@ -171,11 +171,16 @@ jQuery(document).ready(function() {
 	//Catch event click number of pagination
 	jQuery('#myPager').on('click', 'li > a', function(event) {
 		//console.log(data);
+		
 		var oldCLick = jQuery('#myPager').find('li.active > a').text();
 		if(jQuery(this).parent().hasClass('active') || jQuery(this).parent().hasClass('disabled')) {
 			event.preventDefault();
 		} else {
 			event.preventDefault();
+			var checkAllMain = jQuery('.full-contain input[name="check-all-main"]');
+			if(checkAllMain.prop('checked') == true) {
+				checkAllMain.click();
+			}
 			var startNumber = 0;
 			var show = {"employee": []};
 			//Value of tag a
@@ -583,6 +588,7 @@ jQuery(document).ready(function() {
 						}
 						
 					}
+					
 					console.log(name + " " + sex + " " + position + " " + birthday + " " + nationality);
 //					if(typeof position === "undefined") {
 //						alert('ec');
@@ -591,7 +597,7 @@ jQuery(document).ready(function() {
 					if(jQuery('#bt-filter-ei').hasClass('disabled')) {
 						 
 						var numberRow = jQuery('#pagination-number option:selected').val();
-						if(numberRow = "all") {
+						if(numberRow == "all") {
 							numberRow = data['employee'].length;
 						}
 						initPagination(numberRow);
@@ -1047,8 +1053,7 @@ jQuery(document).ready(function() {
 		}
 	});
 	
-jQuery('#span-ei-name input[name="ei-name"]').on('focusout keyup', function(e) {
-		
+	jQuery('#span-ei-name input[name="ei-name"]').on('focusout keyup', function(e) {
 		if(e.type == 'focusout') {
 			//Check not null
 			if(jQuery(this).val().length <= 0) {
@@ -1060,60 +1065,89 @@ jQuery('#span-ei-name input[name="ei-name"]').on('focusout keyup', function(e) {
 		}
 	});
 
-/*
- * Vadidate add new field
- */
-//Vadidate name
-jQuery('#addnew').on('blur', 'input[name="name"]', function(event) {
-	//Check text has special character and contains UTF-8: \u00A1-\uFFFF
-	if((/^[\w\u00A1-\uFFFF ]+$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
-		//Show alert and show on page
-		jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your name can\'t contain special character!</span>');
-		jQuery('#addnew-alert').removeClass('hide');
-		jQuery(this).focus();
-	//If length of text > 45 character is unvalid
-	} else if(jQuery(this).val().length > 45) {
-		jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your name too long. Max: 45 character.</span>');
-		jQuery('#addnew-alert').removeClass('hide');
-		jQuery(this).focus();
-	//If Satisfy condition, we'll hide the alert
-	} else {
-		jQuery('#addnew-alert').addClass('hide');
-	}
-	if(jQuery(this).val() != "") {
-		jQuery(this).css('border','1px solid #ccc');
-	}
-});
+	/*
+	 * Vadidate add new field
+	 */
+	//Vadidate name
+	jQuery('#addnew').on('blur', 'input[name="name"]', function(event) {
+		//Check text has special character and contains UTF-8: \u00A1-\uFFFF
+		if((/^[\w\u00A1-\uFFFF ]+$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
+			//Show alert and show on page
+			jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your name can\'t contain special character!</span>');
+			jQuery('#addnew-alert').removeClass('hide');
+			jQuery(this).focus();
+		//If length of text > 45 character is unvalid
+		} else if(jQuery(this).val().length > 45) {
+			jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your name too long. Max: 45 character.</span>');
+			jQuery('#addnew-alert').removeClass('hide');
+			jQuery(this).focus();
+		//If Satisfy condition, we'll hide the alert
+		} else {
+			jQuery('#addnew-alert').addClass('hide');
+		}
+		if(jQuery(this).val() != "") {
+			jQuery(this).css('border','1px solid #ccc');
+		}
+	});
 
-//Vadidate position
-jQuery('#addnew').on('blur', 'input[name="position"]', function(event) {
-	//Text is not contain special character
-	if((/^[\w\u00A1-\uFFFF ]+$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
-		jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your position can\'t contain special character!</span>');
-		jQuery('#addnew-alert').removeClass('hide');
-		jQuery(this).focus();
-	} else if(jQuery(this).val().length > 60) {
-		jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your position too long. Max: 60 character.</span>');
-		jQuery('#addnew-alert').removeClass('hide');
-		jQuery(this).focus();
-	} else {
-		jQuery('#addnew-alert').addClass('hide');
-	}
-});
+	//Vadidate position
+	jQuery('#addnew').on('blur', 'input[name="position"]', function(event) {
+		//Text is not contain special character
+		if((/^[\w\u00A1-\uFFFF ]+$/.test(jQuery(this).val()) == false && jQuery(this).val() != "")) {
+			jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your position can\'t contain special character!</span>');
+			jQuery('#addnew-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else if(jQuery(this).val().length > 60) {
+			jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your position too long. Max: 60 character.</span>');
+			jQuery('#addnew-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else {
+			jQuery('#addnew-alert').addClass('hide');
+		}
+	});
 
-//Vadidate date
-jQuery('#addnew').on('blur', 'input[name="birthday"]', function(event) {
-	
-	if(/^[0-9]{2}\-[0-9]{2}\-[0-9]{4}$/.test(jQuery(this).val()) == false && jQuery(this).val() != "") {
-		jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your date is unvalid!</span>');
-		jQuery('#addnew-alert').removeClass('hide');
-		jQuery(this).focus();
-	} else {
-		jQuery('#addnew-alert').addClass('hide');
-	}
-});
+	//Vadidate date
+	jQuery('#addnew').on('blur', 'input[name="birthday"]', function(event) {
+		
+		if(/^[0-9]{2}\-[0-9]{2}\-[0-9]{4}$/.test(jQuery(this).val()) == false && jQuery(this).val() != "") {
+			jQuery('#addnew-alert').html('<strong>Error:</strong> <span> Your date is unvalid!</span>');
+			jQuery('#addnew-alert').removeClass('hide');
+			jQuery(this).focus();
+		} else {
+			jQuery('#addnew-alert').addClass('hide');
+		}
+	});
 
+	/*
+	 * Sign up form: check confirm password
+	 */
+	jQuery('#user').on('keyup', 'input[name="passwordConfirm"]', function(event) {
+		var password =  jQuery('#user input#password').val();
+		var confirmPass = jQuery(this).val();
+		
+		if(confirmPass != password) {
+			if(jQuery(this).parent().parent().hasClass('has-success')) {
+				jQuery(this).parent().parent().removeClass('has-success has-feedback');
+				jQuery(this).next().removeClass('glyphicon glyphicon-ok form-control-feedback');
+			} 
+			jQuery(this).parent().parent().addClass('has-error has-feedback');
+			jQuery(this).next().addClass('glyphicon glyphicon-remove form-control-feedback');
+		} else {
+			if(jQuery(this).parent().parent().hasClass('has-error')) {
+				jQuery(this).parent().parent().removeClass('has-error has-feedback');
+				jQuery(this).next().removeClass('glyphicon glyphicon-remove form-control-feedback');
+			} 
+			jQuery(this).parent().parent().addClass('has-success has-feedback');
+			jQuery(this).next().addClass('glyphicon glyphicon-ok form-control-feedback');
+		}
+	});
 
+	jQuery('form#user').submit(function(event) {
+		if(jQuery('#user input[name="passwordConfirm"]').parent().parent().hasClass('has-error')) {
+			event.preventDefault();
+			jQuery('#user input[name="passwordConfirm"]').focus();
+		}
+	});
 	
 	/*
 	*Functions	

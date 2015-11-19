@@ -28,29 +28,17 @@ public class HomeController {
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
+	//Send page to home.jsp
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public ModelAndView home(Locale locale, Model model, HttpSession session) {
+	public ModelAndView home(Locale locale, Model model) {
 		ModelAndView mav = new ModelAndView();
 		logger.info("Welcome home! The client locale is {}.", locale);
-		User user = (User) session.getAttribute("userSession");
-		if (user == null) {
-			System.out.println("New");
-		} else {
-			return new ModelAndView("redirect:" + "/back");
-		}
-		mav.setViewName("login");
-		return mav;
-	}
-	
-	@RequestMapping(value = "/back", method = RequestMethod.GET)
-	public ModelAndView backHome(HttpSession session) {
-		ModelAndView mav = new ModelAndView();
-		if(session.isNew() || session == null) {
-			mav.setViewName("login");
-			return mav;
-		}
+
 		mav.setViewName("home");
 		return mav;
 	}
+	
+	
+	
 
 }

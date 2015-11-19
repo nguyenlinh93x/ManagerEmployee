@@ -204,6 +204,11 @@ html, body, .container-table {
 	padding-left: 8px;
 }
 
+label.col-sm-3 {
+	padding-left: 10px;
+	padding-right: 0;
+}
+
 
 
 

@@ -22,6 +22,7 @@
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
+
 	<beans:bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
@@ -30,43 +31,8 @@
 
 	<context:component-scan base-package="com.project.batis.controller" />
 
-	<!-- Cấu hình mọi thứ ở đây -->
-	<!-- Cấu hình DataSource -->
-	<beans:bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
-		destroy-method="close">
-		<beans:property name="driverClassName" value="com.mysql.jdbc.Driver">
-		</beans:property>
-		<!-- Write utf-8 must have ? path -->
-		<beans:property name="url"
-			value="jdbc:mysql://192.168.1.10:3306/springframework?useUnicode=true&amp;characterEncoding=UTF-8">
-		</beans:property>
-		<beans:property name="username" value="root"></beans:property>
-		<beans:property name="password" value="worklife@2014"></beans:property>
-	</beans:bean>
-	<!-- Kết thúc DataSource -->
 
-	<!-- Cấu hình transactionManager -->
-	<beans:bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		p:dataSource-ref="dataSource">
-	</beans:bean>
-	<!-- Kết thúc transactionManager -->
 
-	<!-- Cấu hình cho sqlSessionFactory -->
-	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<beans:property name="dataSource" ref="dataSource" />
-		<beans:property name="configLocation"
-			value="/WEB-INF/mybatis/sqlmap-config.xml" />
-	</beans:bean>
-	<!-- Kết thúc sqlSessionFactory -->
-	
-	<!-- Tìm kiếm mapper xml -->
-	  <beans:bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <beans:property name="basePackage" value="com.project.batis.mapper" />
-    </beans:bean>
-    <!-- Kết thúc mapper -->
-    
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
- 
+
 </beans:beans>
